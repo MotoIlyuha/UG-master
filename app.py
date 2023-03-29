@@ -66,12 +66,13 @@ def customer(login, password):
                 elif login == "Operator":
                     return render_template('operator.html')
                 else:
-                    data = db.session.query(Power.value).filter_by(user_id=user.ID).all()
-                    # data = [25, 28, 31, 35, 38, 40, 42, 45, 47, 50, 52, 54]
-                    power = sum([i.value for i in data])
+                    power_data, temp_data = get_info_by_period(user, None, None)
+                    power = sum([i.value for i in power_data])
+                    temp = sum([i.value for i in temp_data])
                     price = 5
                     cost = power*price
-                    plt.plot(range(len(data)), [i.value for i in data])
+                    plt.plot(range(len(power_data)), [i.value for i in power_data])
+                    # plt.plot(range(len(temp_data)), [i.value for i in temp_data])
                     img = io.BytesIO()
                     plt.savefig(img, format='png')
                     plot_url = base64.b64encode(img.getvalue()).decode()
@@ -98,7 +99,14 @@ def error():
 
 
 def get_info_by_period(user, start=None, end=None):
-    print(User.query.all())
+    if start is None and end is None:
+        power_data = db.session.query(Power.value).filter_by(user_id=user.ID).all()
+        temp_data = db.session.query(Temperature.value).filter_by(user_id=user.ID).all()
+    else:
+        power_data = db.session.query(Power.value).filter_by(user_id=user.ID).filter(start <= Power.time <= end).all()
+        temp_data = db.session.query(Temperature.value).filter_by(user_id=user.ID)\
+            .filter(start <= Temperature.time <= end).all()
+    return power_data, temp_data
 
 
 def add_power_info(time, user, value):
