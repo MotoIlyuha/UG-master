@@ -12,13 +12,17 @@
 		<div class="center-part">
 			<h2>123456789</h2>
 			<form method="post">
+				<input type="time" id="time" name="time"/>
 				<input type="date" id="date" name="date"/>
 			</form>
 		</div>
 		<div class="left-part"></div>
 	</div>
 	<div class="down-part">
-		<img src="data:image/png;base64,{{ plot_url }}">
+		<div class="line-block">
+			<img src="data:image/png;base64,{{ plot_url_1 }}">
+			<img src="data:image/png;base64,{{ plot_url_2 }}">
+		</div>
 		<form method="post">
 			<label class="switch">
 			  <input type="checkbox">
