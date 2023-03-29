@@ -14,7 +14,7 @@ from create_db import User, Power, Temperature
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///history.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config2['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
