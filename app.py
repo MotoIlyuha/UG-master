@@ -5,7 +5,7 @@ from datetime import datetime
 import io
 import base64
 import matplotlib.pyplot as plt
-from create_db import *
+from create_db import User, Power, Temperature
 
 
 app = Flask(__name__)
@@ -66,12 +66,12 @@ def customer(login, password):
                 elif login == "Operator":
                     return render_template('operator.html')
                 else:
-                    data = db.session.query(User).filter_by(ID='1').order_by(User.ID).all()
+                    data = db.session.query(Power.value).filter_by(user_id=user.ID).all()
                     # data = [25, 28, 31, 35, 38, 40, 42, 45, 47, 50, 52, 54]
-                    power = sum([i.ID for i in data])
+                    power = sum([i.value for i in data])
                     price = 5
                     cost = power*price
-                    plt.plot(range(len(data)), [i.ID for i in data])
+                    plt.plot(range(len(data)), [i.value for i in data])
                     img = io.BytesIO()
                     plt.savefig(img, format='png')
                     plot_url = base64.b64encode(img.getvalue()).decode()
@@ -95,6 +95,24 @@ def op():
 @app.route('/error', methods=['POST', 'GET'])
 def error():
     return render_template('error.html')
+
+
+def get_info_by_period(user, start=None, end=None):
+    print(User.query.all())
+
+
+def add_power_info(time, user, value):
+    u = User.query.get(user)
+    p = Power(time=time, user=u, value=value)
+    db.session.add(p)
+    db.session.commit()
+
+
+def add_temp_info(time, user, value):
+    u = User.query.get(user)
+    p = Temperature(time=time, user=u, value=value)
+    db.session.add(p)
+    db.session.commit()
 
 
 if __name__ == '__main__':
