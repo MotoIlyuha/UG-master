@@ -109,6 +109,10 @@ def get_info_by_period(user, start=None, end=None):
     return power_data, temp_data
 
 
+def get_status(user):
+    return user.status
+
+
 def add_power_info(time, user, value):
     u = User.query.get(user)
     p = Power(time=time, user=u, value=value)
