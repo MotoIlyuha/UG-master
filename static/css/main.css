@@ -226,6 +226,14 @@ body {
   transition: .4s;
 }
 
+.slider {
+  border-radius: 34px;
+}
+
+.slider:before {
+  border-radius: 50%;
+}
+
 input:checked + .slider {
   background-color: #2196F3;
 }
