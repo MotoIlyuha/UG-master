@@ -8,6 +8,10 @@ import matplotlib.pyplot as plt
 from create_db import User, Power, Temperature
 
 
+
+
+
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///history.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
