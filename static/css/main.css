@@ -241,5 +241,5 @@ input:checked + .slider:before {
 }
 
 .line-block {
-display: inline;
+display: flex;
 }
