@@ -67,19 +67,21 @@
 	const data1 = {
 		labels: labels,
 		datasets: [{
-			label: 'Sales',
+			label: 'Power',
+			fillStyle = 'black'
 			backgroundColor: 'rgb(255, 99, 132)',
 			borderColor: 'rgb(255, 99, 132)',
-			data: {{ power_data | tojson}},
+			data: {{ plots_url_1[i] | tojson}},
 		}]
 	};
 	const data2 = {
 		labels: labels,
 		datasets: [{
-			label: 'Sales',
+			label: 'Cost',
+			fillStyle = 'black'
 			backgroundColor: 'rgb(255, 99, 132)',
 			borderColor: 'rgb(255, 99, 132)',
-			data: {{ temp_data | tojson}},
+			data: {{ plots_url_2[i] | tojson}},
 		}]
 	};
 
