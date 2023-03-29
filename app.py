@@ -62,13 +62,24 @@ def customer(login, password):
                 password_ = request.form['password']
             else:
                 if login == "Admin":
-                    return render_template('admin.html')
+                    users = db.session.query(User).all()
+                    users_data = [get_info_by_period(user, None, None) for user in users]
+                    powers = [sum([i.value for i in user[0]]) for user in users]
+                    price = 5
+                    costs = [power * price for power in powers]
+                    plots_url_1 = []
+                    plots_url_2 = []
+                    for user in users_data:
+                        plots_url_1.append([i.value for i in user[0]])
+                        plots_url_2.append([i.value for i in user[1]])
+                    return render_template('admin.html', powers=powers, costs=costs,
+                                           label=list(range(0, len(user[0]))),
+                                           plots_url_1=plots_url_1, plots_url_2=plots_url_2)
                 elif login == "Operator":
                     return render_template('operator.html')
                 else:
                     power_data, temp_data = get_info_by_period(user, None, None)
                     power = sum([i.value for i in power_data])
-                    temp = sum([i.value for i in temp_data])
                     price = 5
                     cost = power*price
                     plot_url_1 = [i.value for i in power_data]
