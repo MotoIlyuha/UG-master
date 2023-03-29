@@ -1,0 +1,29 @@
+{% extends 'index.html' %}
+
+{% block title %}
+Регистрация
+{% endblock %}
+
+{% block body %}
+<div class="login-box">
+  <h2>Регистрация</h2>
+  <form method="post">
+    <div class="user-box">
+      <input type="text" name="login" id="login" required="">
+      <label>Логин</label>
+    </div>
+    <div class="user-box">
+      <input type="password" name="password" id="password" required="">
+      <label>Пароль</label>
+    </div>
+    <center><button><a>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      Зарегистрироваться
+    </a></button></center>
+    <center><a class="to_reg" href="/login">Войти</a></center>
+  </form>
+</div>
+{% endblock %}
