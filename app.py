@@ -67,16 +67,13 @@ def customer(login, password):
                     powers = [sum([i.value for i in data[0]]) for data in users_data]
                     price = 5
                     costs = [power * price for power in powers]
-                    plots_url_1 = []
-                    plots_url_2 = []
-                    for user in users_data:
-                        plots_url_1.append([[i.value for i in data[0]] for data in users_data])
-                        plots_url_2.append([[i.value for i in data[1]] for data in users_data])
+                    plots_url_1 = [[i.value for i in data[0]] for data in users_data]
+                    plots_url_2 = [[i.value for i in data[1]] for data in users_data]
                     logins = [user.login for user in users]
                     state = [user.status for user in users]
                     powers_supply = [user.power_supply for user in users]
                     return render_template('admin.html', powers=powers, costs=costs, state=state,
-                                           label=list(range(0, len(user[0]))), powers_supply=powers_supply,
+                                           label=list(range(0, len(users_data[0]))), powers_supply=powers_supply,
                                            plots_url_1=plots_url_1, plots_url_2=plots_url_2, logins=logins)
                 elif login == "Operator":
                     return render_template('operator.html')
