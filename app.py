@@ -53,10 +53,10 @@ def register():
 
 @app.route('/customer/<login>/<password>', methods=['POST', 'GET'])
 def customer(login, password):
-    user = db.session.query(User).filter_by(login=login).all()
-    if len(user) != 0:
-        user = user[0]
-        if password == user.password:
+    cur_user = db.session.query(User).filter_by(login=login).all()
+    if len(cur_user) != 0:
+        cur_user = cur_user[0]
+        if password == cur_user.password:
             if request.method == 'POST':
                 login_ = request.form['login']
                 password_ = request.form['password']
@@ -64,14 +64,14 @@ def customer(login, password):
                 if login == "Admin":
                     users = db.session.query(User).all()
                     users_data = [get_info_by_period(user, None, None) for user in users]
-                    powers = [sum([i.value for i in user[0]]) for user in users]
+                    powers = [sum([i.value for i in data[0]]) for data in users_data]
                     price = 5
                     costs = [power * price for power in powers]
                     plots_url_1 = []
                     plots_url_2 = []
                     for user in users_data:
-                        plots_url_1.append([i.value for i in user[0]])
-                        plots_url_2.append([i.value for i in user[1]])
+                        plots_url_1.append([[i.value for i in data[0]] for data in users_data])
+                        plots_url_2.append([[i.value for i in data[1]] for data in users_data])
                     logins = [user.login for user in users]
                     state = [user.status for user in users]
                     powers_supply = [user.power_supply for user in users]
@@ -81,7 +81,7 @@ def customer(login, password):
                 elif login == "Operator":
                     return render_template('operator.html')
                 else:
-                    power_data, temp_data = get_info_by_period(user, None, None)
+                    power_data, temp_data = get_info_by_period(cur_user, None, None)
                     power = sum([i.value for i in power_data])
                     price = 5
                     cost = power*price
