@@ -6,14 +6,33 @@
 
 {% block body %}
 <div class="header"></div>
+<button type="button" class="btn btn-success">Success</button>
 <div class="container">
 	<div class="up-part">
 		<div class="right-part"></div>
 		<div class="center-part">
 			<h2>123456789</h2>
-			<form method="post">
-				<input type="time" id="time" name="time"/>
-				<input type="date" id="date" name="date"/>
+			<form method="post" style="display: flex; justify-content: center;">
+				<div style="text-align: left; margin-right: 25rem;">
+					<div class="form-group">
+						<label for="inputTime">Введите дату:</label>
+						<input type="time" class="form-control">
+					</div>
+					<div class="form-group">
+						<label for="inputDate">Введите дату:</label>
+						<input type="date" class="form-control">
+					</div>
+				</div>
+				<div style="text-align: right;">
+					<div class="form-group">
+						<label for="inputTime">Введите дату:</label>
+						<input type="time" class="form-control">
+					</div>
+					<div class="form-group">
+						<label for="inputDate">Введите дату:</label>
+						<input type="date" class="form-control">
+					</div>
+				</div>
 			</form>
 		</div>
 		<div class="left-part"></div>
