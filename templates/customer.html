@@ -20,8 +20,12 @@
 	</div>
 	<div class="down-part">
 		<div class="line-block">
-			<img src="data:image/png;base64,{{ plot_url_1 }}">
-			<img src="data:image/png;base64,{{ plot_url_2 }}">
+			<div style="height: 50vh; width: 50%;">
+				<canvas id="power"></canvas>
+			</div>
+			<div style="height: 50vh; width: 50%;">
+				<canvas id="temp"></canvas>
+			</div>
 		</div>
 		<form method="post">
 			<label class="switch">
@@ -31,4 +35,48 @@
 		</form>
 	</div>
 </div>
+
+<script>
+	const labels = {{ label | tojson}};
+
+	const data1 = {
+		labels: labels,
+		datasets: [{
+			label: 'Sales',
+			backgroundColor: 'rgb(255, 99, 132)',
+			borderColor: 'rgb(255, 99, 132)',
+			data: {{ power_data | tojson}},
+		}]
+	};
+	const data2 = {
+		labels: labels,
+		datasets: [{
+			label: 'Sales',
+			backgroundColor: 'rgb(255, 99, 132)',
+			borderColor: 'rgb(255, 99, 132)',
+			data: {{ temp_data | tojson}},
+		}]
+	};
+
+	const config1 = {
+		type: 'line',
+		data: data1,
+		options: { maintainAspectRatio: false }
+	};
+	const config2 = {
+		type: 'line',
+		data: data2,
+		options: { maintainAspectRatio: false }
+	};
+
+	const power = new Chart(
+		document.getElementById('power'),
+		config1
+	);
+	const temp = new Chart(
+		document.getElementById('temp'),
+		config2
+	);
+
+</script>
 {% endblock %}

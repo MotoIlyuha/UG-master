@@ -71,15 +71,9 @@ def customer(login, password):
                     temp = sum([i.value for i in temp_data])
                     price = 5
                     cost = power*price
-                    plt.plot(range(len(power_data)), [i.value for i in power_data], '-o')
-                    img_1 = io.BytesIO()
-                    plt.savefig(img_1, format='png')
-                    plot_url_1 = base64.b64encode(img_1.getvalue()).decode()
-                    plt.plot(range(len(temp_data)), [i.value for i in temp_data], '-o')
-                    img_2 = io.BytesIO()
-                    plt.savefig(img_2, format='png')
-                    plot_url_2 = base64.b64encode(img_2.getvalue()).decode()
-                    return render_template('customer.html', power=power, cost=cost, plot_url_1=plot_url_1, plot_url_2=plot_url_2)
+                    plot_url_1 = [i.value for i in power_data]
+                    plot_url_2 = [i.value for i in temp_data]
+                    return render_template('customer.html', power=power, cost=cost, label=list(range(0, len(power_data))), power_data=plot_url_1, temp_data=plot_url_2)
         else:
             return redirect('/error')
     else:
