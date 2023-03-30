@@ -1,77 +1,78 @@
 {% extends 'index.html' %}
 
 {% block title %}
-Пользователь
+{{user_data["login"]}}
 {% endblock %}
 
 {% block body %}
 <div class="header"></div>
 <div class="container">
-	<div class="up-part">
-		<div class="right-part"></div>
-		<div class="center-part">
-			<form method="post" style="display: flex; justify-content: center;">
-				<div style="text-align: left; margin-right: 3rem;">
-					<div class="form-group">
-						<label for="inputTime">Введите дату:</label>
-						<input type="time" class="form-control">
+	<div style="display: block; width: 100%; padding: 0 24px">
+		<div class="up-part">
+			<div class="right-part"></div>
+			<div class="center-part">
+				<h1 class="login-label" style="text-align: center">Пользователь: {{user_data["login"]}}</h1>
+				<form method="post" style="display: flex; justify-content: center;">
+					<div style="text-align: left; margin-right: 3rem;">
+						<div class="form-group">
+							<label for="inputTime" style="color: aliceblue">Введите дату:</label>
+							<input type="datetime-local" id="start" name="start">
+						</div>
 					</div>
-					<div class="form-group">
-						<label for="inputDate">Введите дату:</label>
-						<input type="date" class="form-control">
+					<div style="margin-right: 3rem;">
+						<div class="form-group">
+							<label for="inputTime" style="color: aliceblue">Введите дату:</label>
+							<input type="datetime-local" id="end" name="end">
+						</div>
 					</div>
-				</div>
-				<div style="text-align: right;">
-					<div class="form-group">
-						<label for="inputTime">Введите дату:</label>
-						<input type="time" class="form-control">
+					<div style="text-align: right;">
+						<button type="button" class="btn btn-success">Обновить</button>
 					</div>
-					<div class="form-group">
-						<label for="inputDate">Введите дату:</label>
-						<input type="date" class="form-control">
-					</div>
-				</div>
-			</form>
-		</div>
-		<div class="left-part"></div>
-	</div>
-	<div class="down-part">
-		<div class="line-block">
-			<div style="height: 50vh; width: 50%;">
-				<canvas id="power"></canvas>
+				</form>
 			</div>
-			<div style="height: 50vh; width: 50%;">
-				<canvas id="temp"></canvas>
+			<div class="left-part"></div>
+		</div>
+		<div class="down-part">
+			<div class="line-block">
+				<div style="height: 50vh; width: 50%;">
+					<canvas id="power"></canvas>
+				</div>
+				<div style="height: 50vh; width: 50%;">
+					<canvas id="temp"></canvas>
+				</div>
+			</div>
+			<div style="display: flex; margin-top: 16px">
+				<div style="display: flex; flex-direction: column;">
+					<h3 style="color: aliceblue"> Общая потребляемая мощность за выбранный период - {{user_data["power_sum"]}} Вт*ч </h3>
+					<h4 style="color: aliceblue"> Стоимость за выбранный период - {{user_data["cost"]}}₽ </h4>
+				</div>
+				<button type="button" class="btn btn-success" style="
+					margin: 12px 0 12px auto;
+				">Сгенерировать PDF</button>
 			</div>
 		</div>
-		<form method="post">
-			<label class="switch">
-			  <input type="checkbox">
-			  <span class="slider"></span>
-			</label>
-		</form>
 	</div>
 </div>
 
 <script>
-	const labels = {{ label | tojson}};
+	const labels = {{ user_data["minutes"] | tojson}};
 
 	const data1 = {
 		labels: labels,
 		datasets: [{
-			label: 'Sales',
+			label: 'Мощность, Вт*ч',
 			backgroundColor: 'rgb(255, 99, 132)',
 			borderColor: 'rgb(255, 99, 132)',
-			data: {{ power_data | tojson}},
+			data: {{ user_data.power_plt_data | tojson}},
 		}]
 	};
 	const data2 = {
 		labels: labels,
 		datasets: [{
-			label: 'Sales',
+			label: 'Температура, ℃',
 			backgroundColor: 'rgb(255, 99, 132)',
 			borderColor: 'rgb(255, 99, 132)',
-			data: {{ temp_data | tojson}},
+			data: {{ user_data.temp_plt_data | tojson}},
 		}]
 	};
 
@@ -95,5 +96,22 @@
 		config2
 	);
 
+	const power_canvas = document.getElementById('power')
+	const power_img = power_canvas.toDataURL('image/png')
+	const temp_canvas = document.getElementById('power')
+	const temp_img = temp_canvas.toDataURL('image/png')
+
+	var start_timestamp = {{ user_data["label_plt"][0] }} ;
+	var end_timestamp = {{ user_data["label_plt"][-1] }} ;
+	var start_date = new Date(start_timestamp);
+	var end_date = new Date(end_timestamp);
+	var start_dateString = start_date.toISOString().slice(0, 16);
+	var end_dateString = end_date.toISOString().slice(0, 16);
+	var startInput = document.getElementById("start");
+	var endInput = document.getElementById("end");
+	startInput.value = start_dateString;
+	endInput.value = end_dateString;
+
 </script>
+
 {% endblock %}

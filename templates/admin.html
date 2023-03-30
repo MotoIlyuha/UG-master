@@ -9,20 +9,20 @@
 <div class="container">
 	<div class="login_buttons" style="justify-content: center;">
 		{% for user in users_data %}
-		<div class="user-button form-check form-switch">
-			<button type="button" class="btn btn-success">{{user.login}}</button>
-			<input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked"
-				   {% if user.state %} checked {% else %} {% endif %}>
+		<div class="user-button form-check form-switch" id="style-1">
+			<div class="btn-group" role="group" aria-label="...">
+				<button type="button" class="btn btn-success login_button">{{user.login}}</button>
+				<input type="checkbox" data-toggle="switchbutton" checked data-onlabel="Включен" data-offlabel="Выключен" data-onstyle="success" data-offstyle="danger">
+<!--					   {% if user.state %} checked {% else %} {% endif %}-->
+			</div>
 		</div>
 		{% endfor %}
 	</div>
-	<div style="display: block">
+	<div style="display: block; width: 100%; margin: 0 16px">
 		<div class="up-part">
 			<div class="right-part"></div>
 			<div class="center-part">
 				<h1 class="login-label" style="text-align: center">Пользователь: {{users_data[0]["login"]}}</h1>
-				<h2 class="status-label"> {{users_data[0]["state"]}} </h2>
-				<h2 class="pay_stat-label"> {{users_data[0]["pay_stat"]}} </h2>
 				<form method="post" style="display: flex; justify-content: center;">
 					<div style="text-align: left; margin-right: 3rem;">
 						<div class="form-group">
@@ -52,7 +52,15 @@
 					<canvas id="temp"></canvas>
 				</div>
 			</div>
-			<h3 style="color: aliceblue"> Общая потребляемая мощность за выбранный период - {{users_data[0]["power_sum"]}} Вт*ч </h3>
+			<div style="display: flex; margin-top: 16px">
+				<div style="display: flex; flex-direction: column;">
+					<h3 style="color: aliceblue"> Общая потребляемая мощность за выбранный период - {{users_data[0]["power_sum"]}} Вт*ч </h3>
+					<h4 style="color: aliceblue"> Стоимость за выбранный период - {{users_data[0]["cost"]}}₽ </h4>
+				</div>
+				<button type="button" class="btn btn-success" style="
+					margin: 12px 0 12px auto;
+				">{% if users_data[0]["pay_stats"] %} Оплатил {% else %} На оплате {% endif %}</button>
+			</div>
 		</div>
 	</div>
 </div>

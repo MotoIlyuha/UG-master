@@ -175,10 +175,9 @@ body {
 
 
 
-
-
-
 .container {
+  width: 100%;
+  height: 80%;
   position: absolute;
   display: flex;
   top: 50%;
@@ -188,6 +187,7 @@ body {
   box-sizing: border-box;
   box-shadow: 0 15px 25px rgba(0,0,0,.6);
   border-radius: 10px;
+  padding: 24px;
 }
 
 .switch {
@@ -257,8 +257,9 @@ input:checked + .slider:before {
   display: block;
   flex-direction: column;
   overflow-y: auto;
-  height: 600px;
-  width: 200px;
+  height: auto;
+  width: 350px;
+  margin-right: 32px;
 }
 
 .user-button {
@@ -272,5 +273,22 @@ input:checked + .slider:before {
 h1, h2 {
   color: aliceblue;
 }
+
+.login-label {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+#style-1::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+	background-color: #F5F5F5;
+}
+
+.login_button {
+  width: 74px;
+}
+
 
 

@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from create_db import User, Power, Temperature
 from time import strftime, gmtime
+import pdfkit
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///history.db'
@@ -15,19 +16,20 @@ users_data = list()
 def users_data_init():
     price = 5
     users = db.session.query(User).filter_by(role=0).all()
+    ids = [user.ID for user in users]
     power_and_temp = [get_info_by_period(user, None, None) for user in users]
     power_sum = [sum([p.value for p in user[0]]) for user in power_and_temp]
     power_plt_data = [[p.value for p in user[0]] for user in power_and_temp]
     temp_plt_data = [[t.value for t in user[1]] for user in power_and_temp]
     label_plt = [[t.time for t in user[2]] for user in power_and_temp]
-    costs = [user[0] * price for user in power_and_temp]
+    costs = [user * price for user in power_sum]
     powers_supply = [user.power_supply for user in users]
     state = [user.status for user in users]
     logins = [user.login for user in users]
     pay_stats = [user.pay_stat for user in users]
     minutes_str = [[strftime('%M:%S', gmtime(t // 1000)) for t in user] for user in label_plt]
     for i in range(len(users)):
-        users_data.append({"power_sum": power_sum[i], "power_plt_data": power_plt_data[i],
+        users_data.append({"id": ids[i], "power_sum": power_sum[i], "power_plt_data": power_plt_data[i],
                            "temp_plt_data": temp_plt_data[i], "cost": costs[i], "powers_supply": powers_supply[i],
                            "login": logins[i], "state": state[i], "pay_stat": pay_stats[i], "label_plt": label_plt[i],
                            "minutes": minutes_str[i]})
@@ -74,21 +76,14 @@ def register():
 def customer(login, password):
     cur_user = db.session.query(User).filter_by(login=login).all()[0]
     if password == cur_user.password and request.method != 'POST':
+        users_data_init()
         if login == "Admin":
-            users_data_init()
             return render_template('admin.html', users_data=users_data)
         elif login == "Operator":
-            return render_template('operator.html')
+            return render_template('operator.html', users_data=users_data)
         else:
-            pass
-            # ptt = get_info_by_period(cur_user, None, None)
-            # power = sum([i.value for i in power_data])
-            # price = 5
-            # cost = power * price
-            # plot_url_1 = [i.value for i in power_data]
-            # plot_url_2 = [i.value for i in temp_data]
-            # return render_template('customer.html', power=power, cost=cost, label=list(range(0, len(power_data))),
-            #                        power_data=plot_url_1, temp_data=plot_url_2)
+            user_data = users_data[cur_user.ID - 1]
+            return render_template('customer.html', user_data=user_data)
     else:
         return redirect('/error')
 
@@ -127,6 +122,11 @@ def add_temp_info(time, user, value):
     p = Temperature(time=time, user=u, value=value)
     db.session.add(p)
     db.session.commit()
+
+
+def generate_pdf(date):
+    pdf_template = render_template('pdf_temp.html', users_data=users_data, date=date)
+    pdfkit.from_string(pdf_template, 'Отчёт.pdf')
 
 
 if __name__ == '__main__':

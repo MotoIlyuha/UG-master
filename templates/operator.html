@@ -1,9 +1,115 @@
 {% extends 'index.html' %}
 
 {% block title %}
-Операторская панель
+Админ
 {% endblock %}
 
 {% block body %}
-<a>Привет</a>
+<div class="header"></div>
+<div class="container">
+	<div class="login_buttons" style="justify-content: center;">
+		{% for user in users_data %}
+		<div class="user-button form-check form-switch">
+			<button type="button" class="btn btn-success">{{user.login}}</button>
+			<input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked"
+				   {% if user.state %} checked {% else %} {% endif %}>
+		</div>
+		{% endfor %}
+	</div>
+	<div style="display: block; width: 100%">
+		<div class="up-part">
+			<div class="right-part"></div>
+			<div class="center-part">
+				<h1 class="login-label" style="text-align: center">Пользователь: {{users_data[0]["login"]}}</h1>
+				<h2 class="status-label"> {{users_data[0]["state"]}} </h2>
+				<h2 class="pay_stat-label"> {{users_data[0]["pay_stat"]}} </h2>
+				<form method="post" style="display: flex; justify-content: center;">
+					<div style="text-align: left; margin-right: 3rem;">
+						<div class="form-group">
+							<label for="inputTime" style="color: aliceblue">Введите дату:</label>
+							<input type="datetime-local" id="start" name="start">
+						</div>
+					</div>
+					<div style="margin-right: 3rem;">
+						<div class="form-group">
+							<label for="inputTime" style="color: aliceblue">Введите дату:</label>
+							<input type="datetime-local" id="end" name="end">
+						</div>
+					</div>
+					<div style="text-align: right;">
+						<button type="button" class="btn btn-success">Обновить</button>
+					</div>
+				</form>
+			</div>
+			<div class="left-part"></div>
+		</div>
+		<div class="down-part">
+			<div class="line-block">
+				<div style="height: 50vh; width: 50%;">
+					<canvas id="power"></canvas>
+				</div>
+				<div style="height: 50vh; width: 50%;">
+					<canvas id="temp"></canvas>
+				</div>
+			</div>
+			<h3 style="color: aliceblue"> Общая потребляемая мощность за выбранный период - {{users_data[0]["power_sum"]}} Вт*ч </h3>
+		</div>
+	</div>
+</div>
+
+<script>
+	const labels = {{ users_data[0]["minutes"] | tojson}};
+
+	const data1 = {
+		labels: labels,
+		datasets: [{
+			label: 'Мощность, Вт*ч',
+			backgroundColor: 'rgb(255, 99, 132)',
+			borderColor: 'rgb(255, 99, 132)',
+			data: {{ users_data[0].power_plt_data | tojson}},
+		}]
+	};
+	const data2 = {
+		labels: labels,
+		datasets: [{
+			label: 'Температура, ℃',
+			backgroundColor: 'rgb(255, 99, 132)',
+			borderColor: 'rgb(255, 99, 132)',
+			data: {{ users_data[0].temp_plt_data | tojson}},
+		}]
+	};
+
+	const config1 = {
+		type: 'line',
+		data: data1,
+		options: { maintainAspectRatio: false }
+	};
+	const config2 = {
+		type: 'line',
+		data: data2,
+		options: { maintainAspectRatio: false }
+	};
+
+	const power = new Chart(
+		document.getElementById('power'),
+		config1
+	);
+	const temp = new Chart(
+		document.getElementById('temp'),
+		config2
+	);
+
+	var start_timestamp = {{ users_data[0]["label_plt"][0] }} ;
+	var end_timestamp = {{ users_data[0]["label_plt"][-1] }} ;
+	var start_date = new Date(start_timestamp);
+	var end_date = new Date(end_timestamp);
+	var start_dateString = start_date.toISOString().slice(0, 16);
+	var end_dateString = end_date.toISOString().slice(0, 16);
+	var startInput = document.getElementById("start");
+	var endInput = document.getElementById("end");
+	startInput.value = start_dateString;
+	endInput.value = end_dateString;
+
+</script>
+
 {% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'index.html' %}
+
+{% block title %}
+{{user_data["login"]}}
+{% endblock %}
+
+{% block body %}
+<div class="header"></div>
+<div class="container">
+	<div style="display: block; width: 100%; padding: 0 24px">
+		<div class="up-part">
+			<div class="right-part"></div>
+			<div class="center-part">
+				<h1 class="login-label" style="text-align: center">Пользователь: {{user_data["login"]}}</h1>
+                <div style="display: flex; margin-top: 16px">
+                    <div style="display: flex; flex-direction: column;">
+                        <h3 style="color: aliceblue"> Общая потребляемая мощность за выбранный период - {{user_data["power_sum"]}} Вт*ч </h3>
+                        <h4 style="color: aliceblue"> Стоимость за выбранный период - {{user_data["cost"]}}₽ </h4>
+                    </div>
+                </div>
+			</div>
+			<div class="left-part"></div>
+		</div>
+		<div class="down-part">
+			<div class="line-block">
+				<div style="height: 50vh; width: 50%;">
+					<canvas id="power"></canvas>
+				</div>
+				<div style="height: 50vh; width: 50%;">
+					<canvas id="temp"></canvas>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
