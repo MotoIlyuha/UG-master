@@ -257,7 +257,8 @@ input:checked + .slider:before {
   display: block;
   flex-direction: column;
   overflow-y: auto;
-  height: 500px;
+  height: 600px;
+  width: 200px;
 }
 
 .user-button {
@@ -267,3 +268,9 @@ input:checked + .slider:before {
 .form-check-input {
   margin-top: auto;
 }
+
+h1, h2 {
+  color: aliceblue;
+}
+
+

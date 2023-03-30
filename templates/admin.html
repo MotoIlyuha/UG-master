@@ -20,16 +20,19 @@
 		<div class="up-part">
 			<div class="right-part"></div>
 			<div class="center-part">
+				<h1 class="login-label" style="text-align: center">Пользователь: {{users_data[0]["login"]}}</h1>
+				<h2 class="status-label"> {{users_data[0]["state"]}} </h2>
+				<h2 class="pay_stat-label"> {{users_data[0]["pay_stat"]}} </h2>
 				<form method="post" style="display: flex; justify-content: center;">
 					<div style="text-align: left; margin-right: 3rem;">
 						<div class="form-group">
-							<label for="inputTime">Введите дату:</label>
+							<label for="inputTime" style="color: aliceblue">Введите дату:</label>
 							<input type="datetime-local" id="start" name="start">
 						</div>
 					</div>
 					<div style="margin-right: 3rem;">
 						<div class="form-group">
-							<label for="inputTime">Введите дату:</label>
+							<label for="inputTime" style="color: aliceblue">Введите дату:</label>
 							<input type="datetime-local" id="end" name="end">
 						</div>
 					</div>
@@ -49,17 +52,18 @@
 					<canvas id="temp"></canvas>
 				</div>
 			</div>
+			<h3 style="color: aliceblue"> Общая потребляемая мощность за выбранный период - {{users_data[0]["power_sum"]}} Вт*ч </h3>
 		</div>
 	</div>
 </div>
 
 <script>
-	const labels = {{ users_data[0].label_plt | tojson}};
+	const labels = {{ users_data[0]["minutes"] | tojson}};
 
 	const data1 = {
 		labels: labels,
 		datasets: [{
-			label: 'Мощность, Вт',
+			label: 'Мощность, Вт*ч',
 			backgroundColor: 'rgb(255, 99, 132)',
 			borderColor: 'rgb(255, 99, 132)',
 			data: {{ users_data[0].power_plt_data | tojson}},
@@ -95,8 +99,8 @@
 		config2
 	);
 
-	var start_timestamp = {{ users_data[0].label_plt[0][0] }} ;
-	var end_timestamp = {{ users_data[0].label_plt[-1][1] }} ;
+	var start_timestamp = {{ users_data[0]["label_plt"][0] }} ;
+	var end_timestamp = {{ users_data[0]["label_plt"][-1] }} ;
 	var start_date = new Date(start_timestamp);
 	var end_date = new Date(end_timestamp);
 	var start_dateString = start_date.toISOString().slice(0, 16);

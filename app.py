@@ -1,7 +1,8 @@
-from flask import Flask, render_template, url_for, request, redirect
+from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from create_db import User, Power, Temperature
+from time import strftime, gmtime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///history.db'
@@ -24,10 +25,12 @@ def users_data_init():
     state = [user.status for user in users]
     logins = [user.login for user in users]
     pay_stats = [user.pay_stat for user in users]
+    minutes_str = [[strftime('%M:%S', gmtime(t // 1000)) for t in user] for user in label_plt]
     for i in range(len(users)):
         users_data.append({"power_sum": power_sum[i], "power_plt_data": power_plt_data[i],
                            "temp_plt_data": temp_plt_data[i], "cost": costs[i], "powers_supply": powers_supply[i],
-                           "login": logins[i], "state": state[i], "pay_stat": pay_stats[i], "label_plt": label_plt})
+                           "login": logins[i], "state": state[i], "pay_stat": pay_stats[i], "label_plt": label_plt[i],
+                           "minutes": minutes_str[i]})
 
 
 @app.route('/', methods=['POST', 'GET'])
@@ -99,9 +102,8 @@ def get_info_by_period(user, start=None, end=None):
     if start is None and end is None:
         temp_data = db.session.query(Temperature.value).filter_by(user_id=user.ID).all()
         power_data = db.session.query(Power.value).filter_by(user_id=user.ID).all()
-        time = db.session.query(Power.time).filter_by(user_id=user.ID).all()
-        time_period = (time[0], time[-1])
-        return power_data, temp_data, time_period
+        time_data = db.session.query(Power.time).filter_by(user_id=user.ID).all()
+        return power_data, temp_data, time_data
     else:
         power_data = db.session.query(Power.value).filter_by(user_id=user.ID).filter(start <= Power.time <= end).all()
         temp_data = db.session.query(Temperature.value).filter_by(user_id=user.ID) \
