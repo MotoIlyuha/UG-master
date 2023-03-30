@@ -23,22 +23,14 @@
 				<form method="post" style="display: flex; justify-content: center;">
 					<div style="text-align: left; margin-right: 3rem;">
 						<div class="form-group">
-							<label for="inputDate">Введите дату:</label>
-							<input type="date" class="form-control">
-						</div>
-						<div class="form-group">
 							<label for="inputTime">Введите дату:</label>
-							<input type="time" class="form-control">
+							<input type="datetime-local" id="start" name="start">
 						</div>
 					</div>
 					<div style="margin-right: 3rem;">
 						<div class="form-group">
-							<label for="inputDate">Введите дату:</label>
-							<input type="date" class="form-control">
-						</div>
-						<div class="form-group">
 							<label for="inputTime">Введите дату:</label>
-							<input type="time" class="form-control">
+							<input type="datetime-local" id="end" name="end">
 						</div>
 					</div>
 					<div style="text-align: right;">
@@ -58,29 +50,28 @@
 				</div>
 			</div>
 		</div>
-		<h2>{{ state[i] }}</h2>
 	</div>
 </div>
 
 <script>
-	const labels = {{ label | tojson}};
+	const labels = {{ users_data[0].label_plt | tojson}};
 
 	const data1 = {
 		labels: labels,
 		datasets: [{
-			label: 'Sales',
+			label: 'Мощность, Вт',
 			backgroundColor: 'rgb(255, 99, 132)',
 			borderColor: 'rgb(255, 99, 132)',
-			data: {{ users_data[0].power_plt_1 | tojson}},
+			data: {{ users_data[0].power_plt_data | tojson}},
 		}]
 	};
 	const data2 = {
 		labels: labels,
 		datasets: [{
-			label: 'Sales',
+			label: 'Температура, ℃',
 			backgroundColor: 'rgb(255, 99, 132)',
 			borderColor: 'rgb(255, 99, 132)',
-			data: {{ users_data[0].temp_plt_1 | tojson}},
+			data: {{ users_data[0].temp_plt_data | tojson}},
 		}]
 	};
 
@@ -104,5 +95,17 @@
 		config2
 	);
 
+	var start_timestamp = {{ users_data[0].label_plt[0][0] }} ;
+	var end_timestamp = {{ users_data[0].label_plt[-1][1] }} ;
+	var start_date = new Date(start_timestamp);
+	var end_date = new Date(end_timestamp);
+	var start_dateString = start_date.toISOString().slice(0, 16);
+	var end_dateString = end_date.toISOString().slice(0, 16);
+	var startInput = document.getElementById("start");
+	var endInput = document.getElementById("end");
+	startInput.value = start_dateString;
+	endInput.value = end_dateString;
+
 </script>
+
 {% endblock %}

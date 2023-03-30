@@ -1423,136 +1423,152 @@
     <argument id="503" parent="172">
       <Position>1</Position>
     </argument>
-    <table id="504" parent="173" name="power"/>
-    <table id="505" parent="173" name="sqlite_master">
+    <table id="504" parent="173" name="alembic_version"/>
+    <table id="505" parent="173" name="power"/>
+    <table id="506" parent="173" name="sqlite_master">
       <System>1</System>
     </table>
-    <table id="506" parent="173" name="sqlite_sequence">
+    <table id="507" parent="173" name="sqlite_sequence">
       <System>1</System>
     </table>
-    <table id="507" parent="173" name="temperature"/>
-    <table id="508" parent="173" name="user"/>
-    <column id="509" parent="504" name="time">
-      <DasType>DATETIME|0s</DasType>
+    <table id="508" parent="173" name="temperature"/>
+    <table id="509" parent="173" name="user"/>
+    <column id="510" parent="504" name="version_num">
+      <DasType>VARCHAR(32)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="510" parent="504" name="user_id">
+    <index id="511" parent="504" name="sqlite_autoindex_alembic_version_1">
+      <ColNames>version_num</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <Unique>1</Unique>
+    </index>
+    <key id="512" parent="504" name="alembic_version_pkc">
+      <ColNames>version_num</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>sqlite_autoindex_alembic_version_1</UnderlyingIndexName>
+    </key>
+    <column id="513" parent="505" name="time">
+      <DasType>INTEGER|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+    </column>
+    <column id="514" parent="505" name="user_id">
       <DasType>INTEGER|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="511" parent="504" name="value">
+    <column id="515" parent="505" name="value">
       <DasType>INTEGER|0s</DasType>
       <Position>3</Position>
     </column>
-    <foreign-key id="512" parent="504">
+    <foreign-key id="516" parent="505">
       <ColNames>user_id</ColNames>
       <RefColNames>ID</RefColNames>
       <RefTableName>user</RefTableName>
     </foreign-key>
-    <index id="513" parent="504" name="sqlite_autoindex_power_1">
+    <index id="517" parent="505" name="sqlite_autoindex_power_1">
       <ColNames>time
 user_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Unique>1</Unique>
     </index>
-    <key id="514" parent="504">
+    <key id="518" parent="505">
       <ColNames>time
 user_id</ColNames>
       <Primary>1</Primary>
       <UnderlyingIndexName>sqlite_autoindex_power_1</UnderlyingIndexName>
     </key>
-    <column id="515" parent="505" name="type">
+    <column id="519" parent="506" name="type">
       <DasType>TEXT|0s</DasType>
       <Position>1</Position>
     </column>
-    <column id="516" parent="505" name="name">
+    <column id="520" parent="506" name="name">
       <DasType>TEXT|0s</DasType>
       <Position>2</Position>
     </column>
-    <column id="517" parent="505" name="tbl_name">
+    <column id="521" parent="506" name="tbl_name">
       <DasType>TEXT|0s</DasType>
       <Position>3</Position>
     </column>
-    <column id="518" parent="505" name="rootpage">
+    <column id="522" parent="506" name="rootpage">
       <DasType>INT|0s</DasType>
       <Position>4</Position>
     </column>
-    <column id="519" parent="505" name="sql">
+    <column id="523" parent="506" name="sql">
       <DasType>TEXT|0s</DasType>
       <Position>5</Position>
     </column>
-    <column id="520" parent="506" name="name">
+    <column id="524" parent="507" name="name">
       <Position>1</Position>
     </column>
-    <column id="521" parent="506" name="seq">
+    <column id="525" parent="507" name="seq">
       <Position>2</Position>
     </column>
-    <column id="522" parent="507" name="time">
-      <DasType>DATETIME|0s</DasType>
+    <column id="526" parent="508" name="time">
+      <DasType>INTEGER|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="523" parent="507" name="user_id">
+    <column id="527" parent="508" name="user_id">
       <DasType>INTEGER|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="524" parent="507" name="value">
+    <column id="528" parent="508" name="value">
       <DasType>INTEGER|0s</DasType>
       <Position>3</Position>
     </column>
-    <foreign-key id="525" parent="507">
+    <foreign-key id="529" parent="508">
       <ColNames>user_id</ColNames>
       <RefColNames>ID</RefColNames>
       <RefTableName>user</RefTableName>
     </foreign-key>
-    <index id="526" parent="507" name="sqlite_autoindex_temperature_1">
+    <index id="530" parent="508" name="sqlite_autoindex_temperature_1">
       <ColNames>time
 user_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Unique>1</Unique>
     </index>
-    <key id="527" parent="507">
+    <key id="531" parent="508">
       <ColNames>time
 user_id</ColNames>
       <Primary>1</Primary>
       <UnderlyingIndexName>sqlite_autoindex_temperature_1</UnderlyingIndexName>
     </key>
-    <column id="528" parent="508" name="ID">
+    <column id="532" parent="509" name="ID">
       <DasType>INTEGER|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="529" parent="508" name="login">
+    <column id="533" parent="509" name="login">
       <DasType>VARCHAR(255)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="530" parent="508" name="password">
+    <column id="534" parent="509" name="password">
       <DasType>VARCHAR(32)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="531" parent="508" name="role">
+    <column id="535" parent="509" name="role">
       <DasType>INTEGER|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="532" parent="508" name="power_supply">
+    <column id="536" parent="509" name="power_supply">
       <DasType>INTEGER|0s</DasType>
       <Position>5</Position>
     </column>
-    <column id="533" parent="508" name="status">
+    <column id="537" parent="509" name="status">
       <DasType>BOOLEAN|0s</DasType>
       <Position>6</Position>
     </column>
-    <column id="534" parent="508" name="pay_stat">
+    <column id="538" parent="509" name="pay_stat">
       <DasType>BOOLEAN|0s</DasType>
       <Position>7</Position>
     </column>
-    <key id="535" parent="508">
+    <key id="539" parent="509">
       <ColNames>ID</ColNames>
       <Primary>1</Primary>
     </key>

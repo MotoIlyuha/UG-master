@@ -26,7 +26,7 @@ class User(db.Model):
 
 class Power(db.Model):
     __tablename__ = 'power'
-    time = db.Column(db.DateTime, default=datetime.utcnow, primary_key=True)
+    time = db.Column(db.Integer, default=datetime.utcnow, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.ID'), primary_key=True)
     value = db.Column(db.Integer)
 
@@ -36,7 +36,7 @@ class Power(db.Model):
 
 class Temperature(db.Model):
     __tablename__ = 'temperature'
-    time = db.Column(db.DateTime, default=datetime.utcnow, primary_key=True)
+    time = db.Column(db.Integer, default=datetime.utcnow, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.ID'), primary_key=True)
     value = db.Column(db.Integer)
 

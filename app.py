@@ -1,16 +1,13 @@
 from flask import Flask, render_template, url_for, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
-
-import io
-import base64
-import matplotlib.pyplot as plt
+from flask_migrate import Migrate
 from create_db import User, Power, Temperature
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///history.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 users_data = list()
 
 
@@ -21,6 +18,7 @@ def users_data_init():
     power_sum = [sum([p.value for p in user[0]]) for user in power_and_temp]
     power_plt_data = [[p.value for p in user[0]] for user in power_and_temp]
     temp_plt_data = [[t.value for t in user[1]] for user in power_and_temp]
+    label_plt = [[t.time for t in user[2]] for user in power_and_temp]
     costs = [user[0] * price for user in power_and_temp]
     powers_supply = [user.power_supply for user in users]
     state = [user.status for user in users]
@@ -29,7 +27,7 @@ def users_data_init():
     for i in range(len(users)):
         users_data.append({"power_sum": power_sum[i], "power_plt_data": power_plt_data[i],
                            "temp_plt_data": temp_plt_data[i], "cost": costs[i], "powers_supply": powers_supply[i],
-                           "login": logins[i], "state": state[i], "pay_stat": pay_stats[i]})
+                           "login": logins[i], "state": state[i], "pay_stat": pay_stats[i], "label_plt": label_plt})
 
 
 @app.route('/', methods=['POST', 'GET'])
@@ -75,22 +73,19 @@ def customer(login, password):
     if password == cur_user.password and request.method != 'POST':
         if login == "Admin":
             users_data_init()
-            power_plt_1 = users_data[0]["power_plt_data"]
-            temp_plt_1 = users_data[0]["temp_plt_data"]
-            logins = [user["login"] for user in users_data]
-            state = [user["state"] for user in users_data]
             return render_template('admin.html', users_data=users_data)
         elif login == "Operator":
             return render_template('operator.html')
         else:
-            power_data, temp_data = get_info_by_period(cur_user, None, None)
-            power = sum([i.value for i in power_data])
-            price = 5
-            cost = power * price
-            plot_url_1 = [i.value for i in power_data]
-            plot_url_2 = [i.value for i in temp_data]
-            return render_template('customer.html', power=power, cost=cost, label=list(range(0, len(power_data))),
-                                   power_data=plot_url_1, temp_data=plot_url_2)
+            pass
+            # ptt = get_info_by_period(cur_user, None, None)
+            # power = sum([i.value for i in power_data])
+            # price = 5
+            # cost = power * price
+            # plot_url_1 = [i.value for i in power_data]
+            # plot_url_2 = [i.value for i in temp_data]
+            # return render_template('customer.html', power=power, cost=cost, label=list(range(0, len(power_data))),
+            #                        power_data=plot_url_1, temp_data=plot_url_2)
     else:
         return redirect('/error')
 
@@ -102,13 +97,16 @@ def error():
 
 def get_info_by_period(user, start=None, end=None):
     if start is None and end is None:
-        power_data = db.session.query(Power.value).filter_by(user_id=user.ID).all()
         temp_data = db.session.query(Temperature.value).filter_by(user_id=user.ID).all()
+        power_data = db.session.query(Power.value).filter_by(user_id=user.ID).all()
+        time = db.session.query(Power.time).filter_by(user_id=user.ID).all()
+        time_period = (time[0], time[-1])
+        return power_data, temp_data, time_period
     else:
         power_data = db.session.query(Power.value).filter_by(user_id=user.ID).filter(start <= Power.time <= end).all()
         temp_data = db.session.query(Temperature.value).filter_by(user_id=user.ID) \
             .filter(start <= Temperature.time <= end).all()
-    return power_data, temp_data
+        return power_data, temp_data, (start, end)
 
 
 def get_status(user):
@@ -131,4 +129,3 @@ def add_temp_info(time, user, value):
 
 if __name__ == '__main__':
     app.run(debug=True)
-    users_data_init()
