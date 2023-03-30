@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from create_db import User, Power, Temperature
 from time import strftime, gmtime
+import datetime
 import pdfkit
 
 app = Flask(__name__)
@@ -77,6 +78,8 @@ def customer(login, password):
     cur_user = db.session.query(User).filter_by(login=login).all()[0]
     if password == cur_user.password and request.method != 'POST':
         users_data_init()
+        print(len(get_info_by_period(cur_user)[0]))
+        print(len(get_info_by_period(cur_user, '2023-03-29T19:27', '2023-03-29T20:26')[0]))
         if login == "Admin":
             return render_template('admin.html', users_data=users_data)
         elif login == "Operator":
@@ -100,10 +103,15 @@ def get_info_by_period(user, start=None, end=None):
         time_data = db.session.query(Power.time).filter_by(user_id=user.ID).all()
         return power_data, temp_data, time_data
     else:
-        power_data = db.session.query(Power.value).filter_by(user_id=user.ID).filter(start <= Power.time <= end).all()
+        start = int(datetime.datetime.strptime(start, "%Y-%m-%dT%H:%M").timestamp()) * 1000
+        end = int(datetime.datetime.strptime(end, "%Y-%m-%dT%H:%M").timestamp()) * 1000
+        power_data = db.session.query(Power.time).filter_by(user_id=user.ID)\
+            .filter(start <= Power.time).all()
         temp_data = db.session.query(Temperature.value).filter_by(user_id=user.ID) \
-            .filter(start <= Temperature.time <= end).all()
-        return power_data, temp_data, (start, end)
+            .filter(start <= Temperature.time, Temperature.time <= end).all()
+        time_data = db.session.query(Power.time).filter_by(user_id=user.ID)\
+            .filter(start <= Power.time, Power.time <= end).all()
+        return power_data, temp_data, time_data
 
 
 def get_status(user):

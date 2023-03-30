@@ -7,13 +7,13 @@
 {% block body %}
 <div class="header"></div>
 <div class="container">
-	<div class="login_buttons" style="justify-content: center;">
+	<div class="login_buttons" id="style-1">
 		{% for user in users_data %}
-		<div class="user-button form-check form-switch" id="style-1">
+		<div class="user-button form-check">
 			<div class="btn-group" role="group" aria-label="...">
 				<button type="button" class="btn btn-success login_button">{{user.login}}</button>
-				<input type="checkbox" data-toggle="switchbutton" checked data-onlabel="Включен" data-offlabel="Выключен" data-onstyle="success" data-offstyle="danger">
-<!--					   {% if user.state %} checked {% else %} {% endif %}-->
+				<input type="checkbox" data-toggle="switchbutton" {% if user.state %} checked {% else %} {% endif %}
+					   data-onlabel="Включен" data-offlabel="Выключен" data-onstyle="success" data-offstyle="danger">
 			</div>
 		</div>
 		{% endfor %}
@@ -54,8 +54,8 @@
 			</div>
 			<div style="display: flex; margin-top: 16px">
 				<div style="display: flex; flex-direction: column;">
-					<h3 style="color: aliceblue"> Общая потребляемая мощность за выбранный период - {{users_data[0]["power_sum"]}} Вт*ч </h3>
-					<h4 style="color: aliceblue"> Стоимость за выбранный период - {{users_data[0]["cost"]}}₽ </h4>
+					<h4 style="color: aliceblue"> Общая потребляемая мощность за выбранный период - {{users_data[0]["power_sum"]}} Вт*ч </h4>
+					<h5 style="color: aliceblue"> Стоимость за выбранный период - {{users_data[0]["cost"]}}₽ </h5>
 				</div>
 				<button type="button" class="btn btn-success" style="
 					margin: 12px 0 12px auto;
