@@ -7,11 +7,29 @@ import base64
 import matplotlib.pyplot as plt
 from create_db import User, Power, Temperature
 
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///history.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+users_data = list()
+
+
+def users_data_init():
+    price = 5
+    users = db.session.query(User).filter_by(role=0).all()
+    power_and_temp = [get_info_by_period(user, None, None) for user in users]
+    power_sum = [sum([p.value for p in user[0]]) for user in power_and_temp]
+    power_plt_data = [[p.value for p in user[0]] for user in power_and_temp]
+    temp_plt_data = [[t.value for t in user[1]] for user in power_and_temp]
+    costs = [user[0] * price for user in power_and_temp]
+    powers_supply = [user.power_supply for user in users]
+    state = [user.status for user in users]
+    logins = [user.login for user in users]
+    pay_stats = [user.pay_stat for user in users]
+    for i in range(len(users)):
+        users_data.append({"power_sum": power_sum[i], "power_plt_data": power_plt_data[i],
+                           "temp_plt_data": temp_plt_data[i], "cost": costs[i], "powers_supply": powers_supply[i],
+                           "login": logins[i], "state": state[i], "pay_stat": pay_stats[i]})
 
 
 @app.route('/', methods=['POST', 'GET'])
@@ -53,52 +71,28 @@ def register():
 
 @app.route('/customer/<login>/<password>', methods=['POST', 'GET'])
 def customer(login, password):
-    cur_user = db.session.query(User).filter_by(login=login).all()
-    if len(cur_user) != 0:
-        cur_user = cur_user[0]
-        if password == cur_user.password:
-            if request.method == 'POST':
-                login_ = request.form['login']
-                password_ = request.form['password']
-            else:
-                if login == "Admin":
-                    users = db.session.query(User).all()
-                    users_data = [get_info_by_period(user, None, None) for user in users]
-                    powers = [sum([i.value for i in data[0]]) for data in users_data]
-                    price = 5
-                    costs = [power * price for power in powers]
-                    plots_url_1 = [[i.value for i in data[0]] for data in users_data]
-                    plots_url_2 = [[i.value for i in data[1]] for data in users_data]
-                    logins = [user.login for user in users]
-                    state = [user.status for user in users]
-                    powers_supply = [user.power_supply for user in users]
-                    return render_template('admin.html', powers=powers, costs=costs, state=state,
-                                           label=list(range(0, len(users_data[0]))), powers_supply=powers_supply,
-                                           plots_url_1=plots_url_1, plots_url_2=plots_url_2, logins=logins)
-                elif login == "Operator":
-                    return render_template('operator.html')
-                else:
-                    power_data, temp_data = get_info_by_period(cur_user, None, None)
-                    power = sum([i.value for i in power_data])
-                    price = 5
-                    cost = power*price
-                    plot_url_1 = [i.value for i in power_data]
-                    plot_url_2 = [i.value for i in temp_data]
-                    return render_template('customer.html', power=power, cost=cost, label=list(range(0, len(power_data))), power_data=plot_url_1, temp_data=plot_url_2)
+    cur_user = db.session.query(User).filter_by(login=login).all()[0]
+    if password == cur_user.password and request.method != 'POST':
+        if login == "Admin":
+            users_data_init()
+            power_plt_1 = users_data[0]["power_plt_data"]
+            temp_plt_1 = users_data[0]["temp_plt_data"]
+            logins = [user["login"] for user in users_data]
+            state = [user["state"] for user in users_data]
+            return render_template('admin.html', users_data=users_data)
+        elif login == "Operator":
+            return render_template('operator.html')
         else:
-            return redirect('/error')
+            power_data, temp_data = get_info_by_period(cur_user, None, None)
+            power = sum([i.value for i in power_data])
+            price = 5
+            cost = power * price
+            plot_url_1 = [i.value for i in power_data]
+            plot_url_2 = [i.value for i in temp_data]
+            return render_template('customer.html', power=power, cost=cost, label=list(range(0, len(power_data))),
+                                   power_data=plot_url_1, temp_data=plot_url_2)
     else:
         return redirect('/error')
-
-
-@app.route('/admin', methods=['POST', 'GET'])
-def admin():
-    return render_template('admin.html')
-
-
-@app.route('/op', methods=['POST', 'GET'])
-def op():
-    return render_template('operator.html')
 
 
 @app.route('/error', methods=['POST', 'GET'])
@@ -112,7 +106,7 @@ def get_info_by_period(user, start=None, end=None):
         temp_data = db.session.query(Temperature.value).filter_by(user_id=user.ID).all()
     else:
         power_data = db.session.query(Power.value).filter_by(user_id=user.ID).filter(start <= Power.time <= end).all()
-        temp_data = db.session.query(Temperature.value).filter_by(user_id=user.ID)\
+        temp_data = db.session.query(Temperature.value).filter_by(user_id=user.ID) \
             .filter(start <= Temperature.time <= end).all()
     return power_data, temp_data
 
@@ -137,3 +131,4 @@ def add_temp_info(time, user, value):
 
 if __name__ == '__main__':
     app.run(debug=True)
+    users_data_init()
