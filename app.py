@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from create_db import User, Power, Temperature
 from time import strftime, gmtime
-import datetime
 import pdfkit
 
 app = Flask(__name__)
@@ -12,9 +11,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 users_data = list()
+user_cur_in_admin = 0
 
 
 def users_data_init():
+    global users_data
+    users_data = list()
     price = 5
     users = db.session.query(User).filter_by(role=0).all()
     ids = [user.ID for user in users]
@@ -76,12 +78,32 @@ def register():
 @app.route('/customer/<login>/<password>', methods=['POST', 'GET'])
 def customer(login, password):
     cur_user = db.session.query(User).filter_by(login=login).all()[0]
-    if password == cur_user.password and request.method != 'POST':
+    if password == cur_user.password:
         users_data_init()
-        print(len(get_info_by_period(cur_user)[0]))
-        print(len(get_info_by_period(cur_user, '2023-03-29T19:27', '2023-03-29T20:26')[0]))
         if login == "Admin":
-            return render_template('admin.html', users_data=users_data)
+            if request.method == 'POST':
+                if request.form.get('pay_status') == 'pay_edit':
+                    print('pay_status')
+                    # поменять значение pay_stat на противоположное !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                else:
+                    for user in db.session.query(User).all():
+                        print(request.form.get(f'switch_{user.login}'), user.status)
+                        if bool(request.form.get(f'switch_{user.login}')) != user.status and not user.status and user.role==0:
+                            print(f'switch_{user.login}')
+                            return render_template('admin.html', users_data=users_data, cur_user=user.ID-1)
+                        if request.form.get(f'log_{user.login}') == f'log_{user.login}':
+                            return render_template('admin.html', users_data=users_data, cur_user=user.ID-1)
+                    start = request.form['start']
+                    end = request.form['end']
+
+                    power_data, temp_data, _ = get_info_by_period(cur_user, start, end)
+                    for user in db.session.query(User).all():
+                        users_data[user.ID - 1]['power_plt_data'] = power_data
+                        users_data[user.ID - 1]['temp_plt_data'] = temp_data
+                    # поменять значение state на противоположное !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+            return render_template('admin.html', users_data=users_data, cur_user=user_cur_in_admin)
         elif login == "Operator":
             return render_template('operator.html', users_data=users_data)
         else:
@@ -103,15 +125,10 @@ def get_info_by_period(user, start=None, end=None):
         time_data = db.session.query(Power.time).filter_by(user_id=user.ID).all()
         return power_data, temp_data, time_data
     else:
-        start = int(datetime.datetime.strptime(start, "%Y-%m-%dT%H:%M").timestamp()) * 1000
-        end = int(datetime.datetime.strptime(end, "%Y-%m-%dT%H:%M").timestamp()) * 1000
-        power_data = db.session.query(Power.time).filter_by(user_id=user.ID)\
-            .filter(start <= Power.time).all()
+        power_data = db.session.query(Power.value).filter_by(user_id=user.ID).filter(start <= Power.time <= end).all()
         temp_data = db.session.query(Temperature.value).filter_by(user_id=user.ID) \
-            .filter(start <= Temperature.time, Temperature.time <= end).all()
-        time_data = db.session.query(Power.time).filter_by(user_id=user.ID)\
-            .filter(start <= Power.time, Power.time <= end).all()
-        return power_data, temp_data, time_data
+            .filter(start <= Temperature.time <= end).all()
+        return power_data, temp_data, (start, end)
 
 
 def get_status(user):
