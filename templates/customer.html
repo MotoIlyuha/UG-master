@@ -12,7 +12,7 @@
 			<div class="right-part"></div>
 			<div class="center-part">
 				<h1 class="login-label" style="text-align: center">Пользователь: {{user_data["login"]}}</h1>
-				<form method="post" style="display: flex; justify-content: center;">
+				<form action="/customer/{{user_data['login']}}/date" method="post" style="display: flex; justify-content: center;">
 					<div style="text-align: left; margin-right: 3rem;">
 						<div class="form-group">
 							<label for="inputTime" style="color: aliceblue">Введите дату:</label>
@@ -26,7 +26,7 @@
 						</div>
 					</div>
 					<div style="text-align: right;">
-						<button type="button" class="btn btn-success">Обновить</button>
+						<button type="submit" class="btn btn-success">Обновить</button>
 					</div>
 				</form>
 			</div>

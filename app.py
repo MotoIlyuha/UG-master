@@ -82,9 +82,9 @@ def customer(login, password):
         users_data_init()
         if login == "Admin":
             if request.method == 'POST':
-                print(request.form)
-            else:
-                return render_template('admin.html', users_data=users_data)
+                print("+++++++++++++++")
+                users_data_init(request.form['start'], request.form['end'])
+            return render_template('admin.html', users_data=users_data)
         elif login == "Operator":
             return render_template('operator.html', users_data=users_data)
         else:
@@ -94,8 +94,16 @@ def customer(login, password):
         return redirect('/error')
 
 
-@app.route('/customer/', methods=['POST', 'GET'])
-def test():
+@app.route('/customer/<login>/date', methods=['POST', 'GET'])
+def change_customer_period(login):
+    users_data_init(request.form['start'], request.form['end'])
+    cur_user = db.session.query(User).filter_by(login=login).all()[0]
+    user_data = users_data[cur_user.ID - 1]
+    return render_template('customer.html', user_data=user_data)
+
+
+@app.route('/admin/date', methods=['POST', 'GET'])
+def change_admin_period():
     users_data_init(request.form['start'], request.form['end'])
     return render_template('admin.html', users_data=users_data)
 
