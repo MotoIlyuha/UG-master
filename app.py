@@ -14,11 +14,13 @@ migrate = Migrate(app, db)
 users_data = list()
 
 
-def users_data_init():
+def users_data_init(start=None, end=None):
+    global users_data
+    users_data = list()
     price = 5
     users = db.session.query(User).filter_by(role=0).all()
     ids = [user.ID for user in users]
-    power_and_temp = [get_info_by_period(user, None, None) for user in users]
+    power_and_temp = [get_info_by_period(user, start, end) for user in users]
     power_sum = [sum([p.value for p in user[0]]) for user in power_and_temp]
     power_plt_data = [[p.value for p in user[0]] for user in power_and_temp]
     temp_plt_data = [[t.value for t in user[1]] for user in power_and_temp]
@@ -76,12 +78,13 @@ def register():
 @app.route('/customer/<login>/<password>', methods=['POST', 'GET'])
 def customer(login, password):
     cur_user = db.session.query(User).filter_by(login=login).all()[0]
-    if password == cur_user.password and request.method != 'POST':
+    if password == cur_user.password:
         users_data_init()
-        print(len(get_info_by_period(cur_user)[0]))
-        print(len(get_info_by_period(cur_user, '2023-03-29T19:27', '2023-03-29T20:26')[0]))
         if login == "Admin":
-            return render_template('admin.html', users_data=users_data)
+            if request.method == 'POST':
+                print(request.form)
+            else:
+                return render_template('admin.html', users_data=users_data)
         elif login == "Operator":
             return render_template('operator.html', users_data=users_data)
         else:
@@ -89,6 +92,12 @@ def customer(login, password):
             return render_template('customer.html', user_data=user_data)
     else:
         return redirect('/error')
+
+
+@app.route('/customer/', methods=['POST', 'GET'])
+def test():
+    users_data_init(request.form['start'], request.form['end'])
+    return render_template('admin.html', users_data=users_data)
 
 
 @app.route('/error', methods=['POST', 'GET'])
@@ -103,10 +112,11 @@ def get_info_by_period(user, start=None, end=None):
         time_data = db.session.query(Power.time).filter_by(user_id=user.ID).all()
         return power_data, temp_data, time_data
     else:
-        start = int(datetime.datetime.strptime(start, "%Y-%m-%dT%H:%M").timestamp()) * 1000
-        end = int(datetime.datetime.strptime(end, "%Y-%m-%dT%H:%M").timestamp()) * 1000
-        power_data = db.session.query(Power.time).filter_by(user_id=user.ID)\
-            .filter(start <= Power.time).all()
+        # 7 часов пропадает, потому что часовой пояс +7 часов
+        start = (int(datetime.datetime.strptime(start, "%Y-%m-%dT%H:%M").timestamp()) + 7 * 60 * 60) * 1000
+        end = (int(datetime.datetime.strptime(end, "%Y-%m-%dT%H:%M").timestamp()) + 7 * 60 * 60) * 1000
+        power_data = db.session.query(Power.value).filter_by(user_id=user.ID)\
+            .filter(start <= Power.time, Power.time <= end).all()
         temp_data = db.session.query(Temperature.value).filter_by(user_id=user.ID) \
             .filter(start <= Temperature.time, Temperature.time <= end).all()
         time_data = db.session.query(Power.time).filter_by(user_id=user.ID)\

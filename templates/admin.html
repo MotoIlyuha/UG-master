@@ -8,36 +8,39 @@
 <div class="header"></div>
 <div class="container">
 	<div class="login_buttons" id="style-1">
+		<form action="/admin" method="post">
 		{% for user in users_data %}
-		<div class="user-button form-check">
-			<div class="btn-group" role="group" aria-label="...">
-				<button type="button" class="btn btn-success login_button">{{user.login}}</button>
-				<input type="checkbox" data-toggle="switchbutton" {% if user.state %} checked {% else %} {% endif %}
-					   data-onlabel="Включен" data-offlabel="Выключен" data-onstyle="success" data-offstyle="danger">
+			<div class="user-button form-check">
+				<div class="btn-group" role="group" aria-label="...">
+					<button type="button" class="btn btn-success login_button" name="user_login">{{user.login}}</button>
+					<input type="checkbox" data-toggle="switchbutton" {% if user.state %} checked {% else %} {% endif %}
+						   data-onlabel="Включен" data-offlabel="Выключен" data-onstyle="success" data-offstyle="danger"
+					name="button-switch" onclick="process({{ user.id }})">
+				</div>
 			</div>
-		</div>
 		{% endfor %}
+		</form>
 	</div>
 	<div style="display: block; width: 100%; margin: 0 16px">
 		<div class="up-part">
 			<div class="right-part"></div>
 			<div class="center-part">
 				<h1 class="login-label" style="text-align: center">Пользователь: {{users_data[0]["login"]}}</h1>
-				<form method="post" style="display: flex; justify-content: center;">
+				<form action="/customer/" method="post" style="display: flex; justify-content: center;">
 					<div style="text-align: left; margin-right: 3rem;">
 						<div class="form-group">
 							<label for="inputTime" style="color: aliceblue">Введите дату:</label>
-							<input type="datetime-local" id="start" name="start">
+							<input type="datetime-local" id="start" name="start" required />
 						</div>
 					</div>
 					<div style="margin-right: 3rem;">
 						<div class="form-group">
 							<label for="inputTime" style="color: aliceblue">Введите дату:</label>
-							<input type="datetime-local" id="end" name="end">
+							<input type="datetime-local" id="end" name="end" required />
 						</div>
 					</div>
 					<div style="text-align: right;">
-						<button type="button" class="btn btn-success">Обновить</button>
+						<button type="submit" class="btn btn-success">Обновить</button>
 					</div>
 				</form>
 			</div>
@@ -117,6 +120,12 @@
 	var endInput = document.getElementById("end");
 	startInput.value = start_dateString;
 	endInput.value = end_dateString;
+
+	function process(index) {
+    $.post("/customer/Admin/admin/", {'index': index}, function (data, status) {
+        alert(`Data: ${data}\nStatus: ${status}`);
+		});
+	}
 
 </script>
 
