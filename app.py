@@ -99,10 +99,11 @@ def change_customer_period(login):
     return render_template('customer.html', user_data=user_data)
 
 
-@app.route('/admin/date', methods=['POST', 'GET'])
-def change_admin_period():
+@app.route('/admin/<login>/date', methods=['POST', 'GET'])
+def change_admin_period(login):
+    cur_user = db.session.query(User).filter_by(login=login).all()[0]
     users_data_init(request.form['start'], request.form['end'])
-    return render_template('admin.html', users_data=users_data)
+    return render_template('admin.html', users_data=users_data, index=cur_user.ID-1)
 
 
 @app.route('/admin/<login>/', methods=['POST', 'GET'])

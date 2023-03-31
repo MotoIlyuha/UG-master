@@ -26,7 +26,7 @@
 			<div class="right-part"></div>
 			<div class="center-part">
 				<h1 class="login-label" style="text-align: center">Пользователь: {{users_data[index]["login"]}}</h1>
-				<form action="/admin/date" method="post" style="display: flex; justify-content: center;">
+				<form action="/admin/{{users_data[index]['login']}}/date" method="post" style="display: flex; justify-content: center;">
 					<div style="text-align: left; margin-right: 3rem;">
 						<div class="form-group">
 							<label for="inputTime" style="color: aliceblue">Введите дату:</label>
