@@ -81,10 +81,7 @@ def customer(login, password):
     if password == cur_user.password:
         users_data_init()
         if login == "Admin":
-            if request.method == 'POST':
-                print("+++++++++++++++")
-                users_data_init(request.form['start'], request.form['end'])
-            return render_template('admin.html', users_data=users_data)
+            return render_template('admin.html', users_data=users_data, index=0)
         elif login == "Operator":
             return render_template('operator.html', users_data=users_data)
         else:
@@ -106,6 +103,13 @@ def change_customer_period(login):
 def change_admin_period():
     users_data_init(request.form['start'], request.form['end'])
     return render_template('admin.html', users_data=users_data)
+
+
+@app.route('/admin/<login>/', methods=['POST', 'GET'])
+def change_customer(login):
+    users_data_init()
+    cur_user = db.session.query(User).filter_by(login=login).all()[0]
+    return render_template('admin.html', users_data=users_data, index=cur_user.ID-1)
 
 
 @app.route('/error', methods=['POST', 'GET'])

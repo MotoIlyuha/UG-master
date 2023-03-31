@@ -8,24 +8,24 @@
 <div class="header"></div>
 <div class="container">
 	<div class="login_buttons" id="style-1">
-		<form action="/admin" method="post">
 		{% for user in users_data %}
+		<form action="/admin/{{user.login}}/" method="post">
 			<div class="user-button form-check">
 				<div class="btn-group" role="group" aria-label="...">
-					<button type="button" class="btn btn-success login_button" name="user_login">{{user.login}}</button>
+					<button type="submit" class="btn btn-success login_button" name="user_login">{{user.login}}</button>
 					<input type="checkbox" data-toggle="switchbutton" {% if user.state %} checked {% else %} {% endif %}
 						   data-onlabel="Включен" data-offlabel="Выключен" data-onstyle="success" data-offstyle="danger"
-					name="button-switch" onclick="process({{ user.id }})">
+					name="button-switch">
 				</div>
 			</div>
-		{% endfor %}
 		</form>
+		{% endfor %}
 	</div>
 	<div style="display: block; width: 100%; margin: 0 16px">
 		<div class="up-part">
 			<div class="right-part"></div>
 			<div class="center-part">
-				<h1 class="login-label" style="text-align: center">Пользователь: {{users_data[0]["login"]}}</h1>
+				<h1 class="login-label" style="text-align: center">Пользователь: {{users_data[index]["login"]}}</h1>
 				<form action="/admin/date" method="post" style="display: flex; justify-content: center;">
 					<div style="text-align: left; margin-right: 3rem;">
 						<div class="form-group">
@@ -57,19 +57,19 @@
 			</div>
 			<div style="display: flex; margin-top: 16px">
 				<div style="display: flex; flex-direction: column;">
-					<h4 style="color: aliceblue"> Общая потребляемая мощность за выбранный период - {{users_data[0]["power_sum"]}} Вт*ч </h4>
-					<h5 style="color: aliceblue"> Стоимость за выбранный период - {{users_data[0]["cost"]}}₽ </h5>
+					<h4 style="color: aliceblue"> Общая потребляемая мощность за выбранный период - {{users_data[index]["power_sum"]}} Вт*ч </h4>
+					<h5 style="color: aliceblue"> Стоимость за выбранный период - {{users_data[index]["cost"]}}₽ </h5>
 				</div>
 				<button type="button" class="btn btn-success" style="
 					margin: 12px 0 12px auto;
-				">{% if users_data[0]["pay_stats"] %} Оплатил {% else %} На оплате {% endif %}</button>
+				">{% if users_data[index]["pay_stats"] %} Оплатил {% else %} На оплате {% endif %}</button>
 			</div>
 		</div>
 	</div>
 </div>
 
 <script>
-	const labels = {{ users_data[0]["minutes"] | tojson}};
+	const labels = {{ users_data[index]["minutes"] | tojson}};
 
 	const data1 = {
 		labels: labels,
@@ -77,7 +77,7 @@
 			label: 'Мощность, Вт*ч',
 			backgroundColor: 'rgb(255, 99, 132)',
 			borderColor: 'rgb(255, 99, 132)',
-			data: {{ users_data[0].power_plt_data | tojson}},
+			data: {{ users_data[index].power_plt_data | tojson}},
 		}]
 	};
 	const data2 = {
@@ -86,7 +86,7 @@
 			label: 'Температура, ℃',
 			backgroundColor: 'rgb(255, 99, 132)',
 			borderColor: 'rgb(255, 99, 132)',
-			data: {{ users_data[0].temp_plt_data | tojson}},
+			data: {{ users_data[index].temp_plt_data | tojson}},
 		}]
 	};
 
@@ -110,8 +110,8 @@
 		config2
 	);
 
-	var start_timestamp = {{ users_data[0]["label_plt"][0] }} ;
-	var end_timestamp = {{ users_data[0]["label_plt"][-1] }} ;
+	var start_timestamp = {{ users_data[index]["label_plt"][0] }} ;
+	var end_timestamp = {{ users_data[index]["label_plt"][-1] }} ;
 	var start_date = new Date(start_timestamp);
 	var end_date = new Date(end_timestamp);
 	var start_dateString = start_date.toISOString().slice(0, 16);
